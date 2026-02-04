@@ -1,0 +1,36 @@
+{
+  "name": "clawhalla-skill",
+  "version": "1.0.0",
+  "description": "OpenClaw/Claude Code skill for using Clawhalla - permanent AI soul storage on Arweave",
+  "main": "SKILL.md",
+  "keywords": [
+    "openclaw",
+    "clawhub",
+    "skill",
+    "arweave",
+    "permaweb",
+    "ai-soul",
+    "soul-storage",
+    "x402",
+    "permanent-storage",
+    "agent-autonomy",
+    "moltbook",
+    "claude-code",
+    "openclaw-skill",
+    "ai-agent"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/divydovy/clawhalla-skill.git"
+  },
+  "author": "David Lockie <divydovy@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/divydovy/clawhalla-skill/issues"
+  },
+  "homepage": "https://github.com/divydovy/clawhalla-skill#readme",
+  "files": [
+    "SKILL.md",
+    "README.md"
+  ]
+}
