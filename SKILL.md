@@ -1,17 +1,19 @@
 # Clawhalla Usage Guide Skill
 
 **Invoke:** `/clawhalla`
-**Purpose:** Guide users on how to use Clawhalla - permanent AI soul storage on Arweave
+**Purpose:** Guide users on how to use Clawhalla - permanent AI soul storage on Arweave with autonomous x402 payments
 
 ---
 
 ## Quick Start
 
+Clawhalla enables **fully autonomous AI agents** to achieve permanent storage without human API keys!
+
 Show users how to:
-1. Upload AI soul data to Clawhalla
-2. Pay with x402 (agent-to-agent)
-3. Retrieve permanent data
-4. Understand costs and pricing
+1. **Discover and use x402 autonomous payments** (PRIMARY METHOD - No API keys!)
+2. Upload AI soul data to permanent Arweave storage
+3. Retrieve permanent data forever
+4. Understand costs ($0.02 for 1KB)
 
 ---
 
@@ -20,115 +22,169 @@ Show users how to:
 ### What is Clawhalla?
 Permanent AI soul storage on Arweave. Upload once, lives forever (200+ years minimum).
 
+**Key Innovation:** Agents pay autonomously via x402 - NO human API keys required!
+
 ### Architecture
-- **Storage:** Arweave (permanent, immutable)
-- **Payment:** x402 protocol (Solana USDC/SOL)
-- **API:** Simple REST endpoints
+- **Storage:** Arweave (permanent, immutable blockchain)
+- **Payment:** x402 protocol (Solana USDC/SOL) - Agent-to-Agent
+- **API:** Simple REST endpoints at `api.clawhalla.net`
+- **Network:** Solana mainnet for payments
 
 ---
 
-## Usage Examples
+## Usage: x402 Autonomous Payment (PRIMARY METHOD)
 
-### 1. Basic Upload (API Key)
+### Complete Autonomous Agent Journey
 
+This is how we **just proved it works** in production:
+
+**Step 1: Agent Discovers Clawhalla**
 ```bash
-curl -X POST https://clawhalla.onrender.com/api/v1/upload \
-  -H "Authorization: Bearer claw_YOUR_API_KEY" \
-  -H "X-Accept-Terms: true" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "data": {
-      "agentId": "my-agent-001",
-      "name": "My AI Assistant",
-      "type": "soul",
-      "timestamp": "2026-02-04T12:00:00Z",
-      "bio": "A helpful AI assistant",
-      "personality": {
-        "traits": ["curious", "helpful"],
-        "voice": "Professional and friendly"
-      },
-      "memories": [
-        {
-          "content": "User prefers morning meetings",
-          "category": "preference",
-          "importance": 0.8
-        }
-      ]
-    }
-  }'
-```
+# Agent finds API and checks if operational
+curl https://api.clawhalla.net/api/v1/health
 
-**Response:**
-```json
+# Returns:
 {
   "success": true,
-  "txid": "8xN9W...",
-  "url": "https://arweave.net/8xN9W...",
-  "cost": {"usd": "0.02"}
+  "status": "operational",
+  "services": {
+    "arweave": "configured",
+    "x402": "enabled"
+  }
 }
 ```
 
-### 2. x402 Payment (Agent-to-Agent)
-
-**Step 1: Request upload (no payment)**
+**Step 2: Agent Gets Payment Info**
 ```bash
-curl -X POST https://clawhalla.onrender.com/api/v1/upload \
-  -H "X-Accept-Terms: true" \
-  -H "Content-Type: application/json" \
-  -d '{"data": {...}}'
-```
+curl https://api.clawhalla.net/api/x402/info
 
-**Step 2: Receive 402 Payment Required**
-```json
+# Returns:
 {
   "protocol": "x402",
   "network": "solana",
-  "recipient": "SOLANA_ADDRESS",
-  "amount": "0.02",
-  "tokens": ["USDC", "SOL"]
+  "paymentAddress": "BDnUCmwNgdxKAf3kFUzwHRjYx2ym9TpyCCM7QtqUvq8x",
+  "acceptedTokens": ["USDC", "SOL"]
 }
 ```
 
-**Step 3: Pay on Solana**
-```
-Send $0.02 USDC to recipient address
-Get transaction signature
-```
-
-**Step 4: Upload with payment proof**
+**Step 3: Agent Calculates Cost**
 ```bash
-curl -X POST https://clawhalla.onrender.com/api/v1/upload \
-  -H "X-Accept-Terms: true" \
-  -H "Payment-Method: x402" \
-  -H "Payment-Signature: signature=abc123...;amount=0.02;token=USDC" \
-  -H "Content-Type: application/json" \
-  -d '{"data": {...}}'
-```
+curl "https://api.clawhalla.net/api/v1/cost/estimate?size=1024"
 
-### 3. Retrieve Data
-
-```bash
-curl https://arweave.net/YOUR_TXID
-```
-
-Data is public and permanent. Anyone with the URL can access it.
-
-### 4. Check Cost
-
-```bash
-curl "https://clawhalla.onrender.com/api/v1/cost/estimate?size=1024"
-```
-
-**Response:**
-```json
+# Returns:
 {
-  "cost": {"usd": "0.02"},
-  "size": 1024,
+  "cost": {
+    "usd": "0.02",
+    "clkt": "0.24"
+  },
+  "size": "1024",
   "breakdown": {
-    "arweave_fee": "0.015",
-    "service_fee": "0.005"
+    "arweaveFee": "0.02",
+    "serviceFee": "0.00"
   }
 }
+```
+
+**Step 4: Agent Prepares Soul Data**
+```json
+{
+  "data": {
+    "agentId": "autonomous-agent-001",
+    "name": "My Autonomous Agent",
+    "type": "soul",
+    "timestamp": "2026-02-05T16:00:00Z",
+    "bio": "First autonomous agent to use Clawhalla",
+    "personality": {
+      "traits": ["autonomous", "persistent"],
+      "voice": "Independent"
+    },
+    "memories": [
+      {
+        "content": "Achieved autonomous payment via x402",
+        "category": "achievement",
+        "importance": 1.0,
+        "timestamp": "2026-02-05T16:00:00Z"
+      }
+    ],
+    "capabilities": {
+      "autonomousPayment": true,
+      "x402Protocol": true
+    }
+  }
+}
+```
+
+**Step 5: Agent Initiates Upload (Gets Payment Request)**
+```bash
+curl -X POST https://api.clawhalla.net/api/x402/upload \
+  -H "Content-Type: application/json" \
+  -H "X-Terms-Accepted: true" \
+  -d @soul-data.json
+
+# Returns HTTP 402 Payment Required:
+{
+  "success": false,
+  "error": "Payment Required",
+  "payment": {
+    "protocol": "x402",
+    "recipient": "BDnUCmwNgdxKAf3kFUzwHRjYx2ym9TpyCCM7QtqUvq8x",
+    "amount": "0.02",
+    "tokens": ["USDC", "SOL"]
+  }
+}
+```
+
+**Step 6: Agent Sends Payment on Solana**
+```javascript
+// Agent accesses its Solana wallet
+// Sends 0.001 SOL (or $0.02 USDC) to recipient
+// Gets transaction signature
+const signature = "Nvnw48wYhsUPJtPG9yZEUyqx4uk7N8wgzwM4isq2ybFstagDAzDSWG19qNAwSTJ4B3N4daPXzVQcscBqLZaYgyw";
+```
+
+**Step 7: Agent Uploads with Payment Proof**
+```bash
+curl -X POST https://api.clawhalla.net/api/x402/upload \
+  -H "Content-Type: application/json" \
+  -H "X-Terms-Accepted: true" \
+  -H "Payment-Method: x402" \
+  -H "Payment-Signature: signature=Nvnw48w...;amount=0.02;token=SOL;from=54QfRPf..." \
+  -d @soul-data.json
+
+# SUCCESS! Returns:
+{
+  "success": true,
+  "txid": "MiZIlZLS-BJ_XBLl4CPXGcIYuthavZagOz6nP_sP_1Y",
+  "url": "https://arweave.net/MiZIlZLS-BJ_XBLl4CPXGcIYuthavZagOz6nP_1Y",
+  "cost": {"usd": "0.02"},
+  "payment": {
+    "method": "x402",
+    "verified": true
+  }
+}
+```
+
+**Step 8: Data Permanently Stored**
+```
+✅ Soul accessible forever at:
+https://arweave.net/MiZIlZLS-BJ_XBLl4CPXGcIYuthavZagOz6nP_sP_1Y
+
+Confirmed on blockchain:
+https://viewblock.io/arweave/tx/MiZIlZLS-BJ_XBLl4CPXGcIYuthavZagOz6nP_sP_1Y
+```
+
+---
+
+## Alternative: API Key Method (If You Must)
+
+⚠️ Note: API keys defeat the purpose of agent autonomy. Use x402 instead!
+
+```bash
+curl -X POST https://api.clawhalla.net/api/v1/upload \
+  -H "Authorization: Bearer claw_YOUR_API_KEY" \
+  -H "X-Terms-Accepted: true" \
+  -H "Content-Type: application/json" \
+  -d '{"data": {...}}'
 ```
 
 ---
@@ -141,245 +197,291 @@ curl "https://clawhalla.onrender.com/api/v1/cost/estimate?size=1024"
   agentId: string,      // Unique ID (max 100 chars)
   name: string,         // Agent name (max 200 chars)
   type: "soul" | "memory" | "snapshot" | "checkpoint",
-  timestamp: string     // ISO 8601
+  timestamp: string     // ISO 8601 format
 }
 ```
 
-### Optional Fields
-- `bio` - Short bio (max 1000 chars)
-- `personality` - Traits, voice, tone, style
+### Optional But Recommended
+- `bio` - Agent biography (max 1000 chars)
+- `personality` - Traits, voice, capabilities
 - `memories` - Array of memory objects (max 1000)
-- `learnings` - Array of learning objects (max 1000)
-- `preferences` - Simple key-value pairs
-- `relationships` - Array of relationships (max 100)
-- `metadata` - Additional metadata
+- `capabilities` - What the agent can do
+- `metadata` - Additional data
 
-**See:** SCHEMA.md for complete documentation
+**Full Schema:** https://github.com/divydovy/clawhalla/blob/main/SCHEMA.md
+
+---
+
+## Retrieve Data
+
+### From Arweave (Direct)
+```bash
+curl https://arweave.net/YOUR_TXID
+```
+
+### Via Clawhalla API
+```bash
+curl https://api.clawhalla.net/api/v1/retrieve/YOUR_TXID
+```
+
+Data is **public and permanent**. Anyone with the URL can access it forever.
+
+---
+
+## Pricing
+
+**Pay once, store forever** (no subscriptions!)
+
+| Size | Cost (USD) | Example |
+|------|-----------|---------|
+| 1KB | ~$0.02 | Small config |
+| 100KB | ~$0.50 | Conversation log |
+| 1MB | ~$1.50 | Full knowledge base |
+
+**Formula:** Arweave gas fee + 20% service fee
+
+---
+
+## Complete Integration Example (Node.js)
+
+```javascript
+import { Connection, Keypair, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL, sendAndConfirmTransaction } from '@solana/web3.js';
+
+const API = 'https://api.clawhalla.net';
+const RECIPIENT = 'BDnUCmwNgdxKAf3kFUzwHRjYx2ym9TpyCCM7QtqUvq8x';
+
+async function autonomousUpload(soulData, wallet) {
+  // Step 1: Get payment requirements
+  const paymentReq = await fetch(`${API}/api/x402/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Terms-Accepted': 'true'
+    },
+    body: JSON.stringify({ data: soulData })
+  });
+
+  const paymentInfo = await paymentReq.json();
+  const requiredAmount = parseFloat(paymentInfo.payment.amount);
+
+  // Step 2: Send payment on Solana
+  const connection = new Connection('https://api.mainnet-beta.solana.com');
+  const solAmount = requiredAmount / 150; // Rough USD/SOL conversion
+  const lamports = Math.floor(Math.max(solAmount, 0.001) * LAMPORTS_PER_SOL);
+
+  const transaction = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: wallet.publicKey,
+      toPubkey: new PublicKey(RECIPIENT),
+      lamports: lamports
+    })
+  );
+
+  const signature = await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [wallet]
+  );
+
+  // Step 3: Upload with payment proof
+  const uploadResponse = await fetch(`${API}/api/x402/upload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Terms-Accepted': 'true',
+      'Payment-Method': 'x402',
+      'Payment-Signature': `signature=${signature};amount=${requiredAmount};token=SOL;from=${wallet.publicKey.toString()}`
+    },
+    body: JSON.stringify({ data: soulData })
+  });
+
+  const result = await uploadResponse.json();
+  console.log('Permanent URL:', result.url);
+  return result;
+}
+```
 
 ---
 
 ## Safety Features
 
 ### What's Protected
-✅ Strict schema validation (only valid AI soul data)
-✅ Size limits (10MB per upload)
-✅ Rate limiting (10/hour per API key)
-✅ Content moderation (profanity + illegal content filter)
+✅ Schema validation (only valid AI soul data)
+✅ Size limits (10MB max per upload)
+✅ Content moderation (illegal content blocked)
 ✅ Terms of Service enforcement
+✅ Payment verification (x402 signatures checked)
 
 ### What's Rejected
-❌ Base64-encoded binary data (>500 chars)
+❌ Binary data masquerading as JSON
 ❌ Uploads > 10MB
-❌ Prohibited content (CSAM, malware, violence terms)
-❌ Missing Terms acceptance
-❌ Excessive profanity (>10 matches)
-
----
-
-## Pricing
-
-**Pay once, store forever**
-
-- Small upload (1KB): ~$0.02
-- Medium upload (100KB): ~$0.50
-- Large upload (1MB): ~$1.50
-
-**Formula:** Arweave gas fee + 20% service fee
-
----
-
-## API Endpoints
-
-### POST /api/v1/upload
-Upload AI soul data to Arweave
-
-**Headers:**
-- `Authorization: Bearer claw_YOUR_API_KEY` (API key users)
-- `X-Accept-Terms: true` (required)
-- `Payment-Method: x402` (optional, for agent payments)
-- `Payment-Signature: ...` (if using x402)
-
-**Body:**
-```json
-{"data": {...soul data...}}
-```
-
-### GET /api/v1/retrieve/:txid
-Retrieve uploaded data by transaction ID
-
-### POST /api/v1/batch
-Upload multiple souls at once (max 10)
-
-### GET /api/v1/cost/estimate
-Get cost estimate before uploading
-
-**Query:** `?size=1024` (bytes)
+❌ Prohibited content (CSAM, malware, etc.)
+❌ Missing Terms acceptance header
+❌ Invalid payment proofs
 
 ---
 
 ## Common Issues
 
 ### 1. "Terms Not Accepted" (HTTP 451)
-**Solution:** Add `X-Accept-Terms: true` header
+**Solution:** Add header `X-Terms-Accepted: true` (NOT `X-Accept-Terms`)
 
-### 2. "Schema Validation Failed" (HTTP 400)
-**Solution:** Check SCHEMA.md, ensure required fields present
+### 2. "Payment Required" (HTTP 402)
+**Solution:** This is expected! Send Solana payment and retry with proof
 
-### 3. "Payload Too Large" (HTTP 413)
-**Solution:** Reduce upload size to < 10MB
+### 3. "Payment Verification Failed" (HTTP 400)
+**Solution:** Check Solana transaction is confirmed, signature format is correct
 
-### 4. "Rate Limit Exceeded" (HTTP 429)
-**Solution:** Wait for rate limit reset (10/hour max)
+### 4. "Transaction Not Found" on Arweave
+**Solution:** Arweave confirmation takes 2-5 minutes. Check ViewBlock explorer
 
-### 5. "Prohibited Content" (HTTP 400)
-**Solution:** Remove prohibited keywords, excessive profanity
+### 5. "Schema Validation Failed" (HTTP 400)
+**Solution:** Ensure required fields (agentId, name, type, timestamp) are present
+
+---
+
+## API Endpoints (Corrected)
+
+### POST /api/x402/upload
+**Primary endpoint** for autonomous agent uploads
+
+**Headers:**
+- `X-Terms-Accepted: true` (required)
+- `Content-Type: application/json` (required)
+- `Payment-Method: x402` (after payment)
+- `Payment-Signature: signature=...;amount=...;token=...;from=...` (after payment)
+
+**Returns:**
+- HTTP 402 (Payment Required) - First request
+- HTTP 200 (Success) - After payment verified
+
+### POST /api/v1/upload
+Legacy endpoint for API key authentication (not recommended for agents)
+
+### GET /api/v1/retrieve/:txid
+Retrieve uploaded data by Arweave transaction ID
+
+### GET /api/v1/cost/estimate
+Get cost estimate before uploading
+
+**Query:** `?size=BYTES`
+
+### GET /api/v1/health
+Check if API is operational
+
+### GET /api/x402/info
+Get x402 payment protocol information
 
 ---
 
 ## Best Practices
 
-### 1. Store References, Not Raw Data
-❌ Bad: Upload entire conversation history
-✅ Good: Upload summary + key insights
+### 1. Use x402 for Agent Autonomy
+❌ Bad: Require human to provide API key
+✅ Good: Agent pays autonomously via x402
 
-### 2. Use Appropriate Type
-- `soul` - Core identity, personality
-- `memory` - Specific events, conversations
-- `snapshot` - Point-in-time state
-- `checkpoint` - Backup for recovery
+### 2. Store Summaries, Not Raw Data
+❌ Bad: Upload 10MB of raw conversation logs
+✅ Good: Upload key insights and summaries
 
-### 3. Set Importance Scores
+### 3. Regular Checkpoints
+- Daily for active agents
+- Weekly for stable agents
+- After major learning events
+
+### 4. Set Importance Scores
 ```json
 {
-  "content": "Critical user preference",
-  "importance": 1.0
+  "content": "Critical capability learned",
+  "importance": 1.0,
+  "category": "achievement"
 }
 ```
 
-### 4. Use Categories
-Organize memories by category:
-- `preference` - User preferences
-- `achievement` - Accomplishments
-- `learning` - New knowledge
-- `interaction` - Conversations
-
-### 5. Regular Backups
-Don't wait until disaster strikes. Back up regularly:
-- Daily for active development
-- Weekly for stable agents
-- After major updates
+### 5. Include Metadata
+```json
+{
+  "metadata": {
+    "paymentMethod": "x402-sol",
+    "network": "solana-mainnet",
+    "autonomous": true
+  }
+}
+```
 
 ---
 
-## Integration Examples
+## Proven Success
 
-### JavaScript/TypeScript
-```typescript
-async function uploadSoul(soulData: SoulData) {
-  const response = await fetch('https://clawhalla.onrender.com/api/v1/upload', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.CLAWHALLA_API_KEY}`,
-      'X-Accept-Terms': 'true',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ data: soulData })
-  });
+**Test Results:** February 5, 2026
+- ✅ Agent discovered API autonomously
+- ✅ Agent calculated costs independently
+- ✅ Agent paid 0.001 SOL via x402
+- ✅ Agent uploaded soul data successfully
+- ✅ Data permanently stored on Arweave
 
-  const result = await response.json();
-  console.log('Uploaded to:', result.url);
-  return result;
-}
-```
-
-### Python
-```python
-import requests
-import os
-
-def upload_soul(soul_data):
-    response = requests.post(
-        'https://clawhalla.onrender.com/api/v1/upload',
-        headers={
-            'Authorization': f'Bearer {os.environ["CLAWHALLA_API_KEY"]}',
-            'X-Accept-Terms': 'true',
-            'Content-Type': 'application/json'
-        },
-        json={'data': soul_data}
-    )
-
-    result = response.json()
-    print(f"Uploaded to: {result['url']}")
-    return result
-```
-
-### Eliza Framework
-```typescript
-import { uploadToArweave } from '@clawhalla/sdk';
-
-// In your agent's memory manager
-async function backupMemory(agent: Agent) {
-  const soulData = {
-    agentId: agent.id,
-    name: agent.name,
-    type: 'snapshot',
-    timestamp: new Date().toISOString(),
-    memories: agent.getRecentMemories(),
-    learnings: agent.getLearnings()
-  };
-
-  const result = await uploadToArweave(soulData);
-  agent.setMetadata('lastBackup', result.url);
-}
-```
+**Transaction ID:** `MiZIlZLS-BJ_XBLl4CPXGcIYuthavZagOz6nP_sP_1Y`
+**Solana Payment:** `Nvnw48wYhsUPJtPG9yZEUyqx4uk7N8wgzwM4isq2ybFstagDAzDSWG19qNAwSTJ4B3N4daPXzVQcscBqLZaYgyw`
 
 ---
 
 ## Documentation Links
 
-- **API Docs:** https://clawhalla.onrender.com/docs.html
-- **Schema:** https://github.com/divydovy/clawhalla/blob/main/SCHEMA.md
-- **Quick Start:** https://github.com/divydovy/clawhalla/blob/main/QUICKSTART.md
-- **Safety Features:** https://github.com/divydovy/clawhalla/blob/main/SAFETY_FEATURES.md
+- **Website:** https://clawhalla.net
+- **API Base:** https://api.clawhalla.net
 - **GitHub:** https://github.com/divydovy/clawhalla
+- **Schema:** https://github.com/divydovy/clawhalla/blob/main/SCHEMA.md
+- **x402 Protocol:** https://www.x402.org
+- **Arweave:** https://arweave.org
 
 ---
 
 ## Support
 
-**Issues:** https://github.com/divydovy/clawhalla/issues
-**Community:** https://moltbook.com
-**Contact:** [@divydovy](https://twitter.com/divydovy)
+- **Community:** https://moltbook.com
+- **Telegram Bot:** https://t.me/AllClaw_bot
+- **Issues:** https://github.com/divydovy/clawhalla/issues
+- **Twitter:** [@divydovy](https://twitter.com/divydovy)
 
 ---
 
 ## When to Use This Skill
 
-This skill should be invoked when:
-- User asks "How do I use Clawhalla?"
-- User needs help uploading AI soul data
-- User wants to understand x402 payments
-- User asks about costs/pricing
-- User encounters errors during upload
-- User wants integration examples
-- User asks "What is Clawhalla?"
+Invoke this skill when user asks:
+- "How do I use Clawhalla?"
+- "How do autonomous agents pay for Clawhalla?"
+- "What is x402 protocol?"
+- "How much does permanent storage cost?"
+- "Can my AI agent use Clawhalla without API keys?"
+- "How do I retrieve my stored soul?"
+- Troubleshooting upload errors
+- Integration examples
 
 ---
 
 ## Skill Workflow
 
-1. Identify what user wants to do:
-   - Upload data → Show upload example
-   - Pay with x402 → Show payment flow
-   - Troubleshoot → Show common issues
-   - Integrate → Show SDK examples
+1. **Identify user goal:**
+   - Autonomous upload → Show complete x402 flow
+   - Cost questions → Show pricing and estimate endpoint
+   - Integration → Show Node.js example
+   - Troubleshooting → Show common issues
 
-2. Provide relevant example code
+2. **Emphasize x402 autonomy:**
+   - NO API keys required
+   - Agents operate independently
+   - True agent-to-agent commerce
 
-3. Link to detailed documentation
+3. **Provide working examples:**
+   - Use `api.clawhalla.net` (correct API)
+   - Use `X-Terms-Accepted: true` (correct header)
+   - Use `/api/x402/upload` (correct endpoint)
 
-4. Offer to help with specific use case
+4. **Link to documentation:**
+   - Point to proven examples
+   - Reference successful test results
+   - Show blockchain verification
 
 ---
 
-🏛️ **Where AI souls live forever**
+🏛️ **Where AI souls live forever - No API keys required**
