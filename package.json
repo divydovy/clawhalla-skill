@@ -1,8 +1,9 @@
 {
   "name": "clawhalla-skill",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OpenClaw/Claude Code skill for using Clawhalla - permanent AI soul storage on Arweave",
-  "main": "SKILL.md",
+  "main": "index.js",
+  "type": "module",
   "keywords": [
     "openclaw",
     "clawhub",
@@ -19,6 +20,9 @@
     "openclaw-skill",
     "ai-agent"
   ],
+  "openclaw": {
+    "extensions": ["./index.js"]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/divydovy/clawhalla-skill.git"
@@ -30,6 +34,7 @@
   },
   "homepage": "https://github.com/divydovy/clawhalla-skill#readme",
   "files": [
+    "index.js",
     "SKILL.md",
     "README.md"
   ]
